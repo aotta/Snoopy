@@ -1,0 +1,28 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "andrea.ottaviani.69@gmail.com",
+    "longName": "Snupy",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "images/snupy.png",
+                "name": "SNOOPY",
+                "targetPlatforms": [
+                    "basalt"
+                ],
+                "type": "png"
+            }
+        ]
+    },
+    "sdkVersion": "3",
+    "shortName": "Snupy",
+    "uuid": "372dd31b-8e23-424d-90f9-14499281fa1c",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": false
+    }
+}
