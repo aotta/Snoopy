@@ -16,11 +16,13 @@
             {
                 "file": "images/ore.png",
                 "name": "IMG_ORE",
+                "targetPlatforms": [
+                    "basalt"
+                ],
                 "type": "png"
             },
             {
                 "file": "images/snupy_noarms.png",
-                "menuIcon": true,
                 "name": "IMG_SNUPY",
                 "type": "png"
             }

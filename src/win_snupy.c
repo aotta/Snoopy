@@ -23,9 +23,9 @@ static GColor Colore;
 
 static void initialise_ui(void) {
   s_window = window_create();
-	Colore = GColorFromRGB(0, 170, 255);
 	Colore = GColorVividCerulean;
   window_set_background_color(s_window, Colore);
+	APP_LOG(APP_LOG_LEVEL_INFO, "Colore: vividcerulean");
   #ifndef PBL_SDK_3
     window_set_fullscreen(s_window, true);
   #endif
@@ -51,6 +51,8 @@ static void initialise_ui(void) {
   rot_bitmap_layer_set_corner_clip_color(s_bitmaplayer_ore, GColorClear);
   rot_bitmap_set_compositing_mode(s_bitmaplayer_ore, GCompOpSet);
 	layer_add_child(window_get_root_layer(s_window), (Layer *)s_bitmaplayer_ore);
+	APP_LOG(APP_LOG_LEVEL_INFO, "Fine inizializzazione");
+	
 }
 
 static void destroy_ui(void) {
@@ -64,27 +66,27 @@ static void destroy_ui(void) {
 }
 // END AUTO-GENERATED UI CODE
 
-static void handle_window_unload(Window* window) {
+static void window_unload(Window* window) {
   destroy_ui();
 }
 
 
 static void hands_update_proc(Layer *layer, GContext *ctx) {
 
-	
+	APP_LOG(APP_LOG_LEVEL_INFO, "rotate start!");
   time_t now = time(NULL);
   struct tm *t = localtime(&now);
   
   // minute/hour hand
 
 	//  "ORE"
-  GPoint src_ic = GPoint(48,20);
+  // GPoint src_ic = GPoint(48,20);
 
   // Angle of rotation
   int angle = (TRIG_MAX_ANGLE * (((t->tm_hour % 12) * 6) + (t->tm_min / 10))) / (12 * 6);
 
 	// Draw!
-  rot_bitmap_set_src_ic(s_bitmaplayer_ore, src_ic);
+  //rot_bitmap_set_src_ic(s_bitmaplayer_ore, src_ic);
 	rot_bitmap_layer_set_angle(s_bitmaplayer_ore,angle);
 
 	
@@ -92,11 +94,12 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
   
   // Angle of rotation
   angle = (TRIG_MAX_ANGLE * t->tm_min / 60);
-  src_ic = GPoint(10,20);
+  //src_ic = GPoint(10,20);
 	
   // Draw!
-	rot_bitmap_set_src_ic(s_bitmaplayer_minuti, src_ic);
+	//rot_bitmap_set_src_ic(s_bitmaplayer_minuti, src_ic);
 	rot_bitmap_layer_set_angle(s_bitmaplayer_minuti,angle);
+	APP_LOG(APP_LOG_LEVEL_INFO, "rotate finish!");
   
 }
 
@@ -112,10 +115,11 @@ static void date_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
+	APP_LOG(APP_LOG_LEVEL_INFO, "minuto cambiato!");
   layer_mark_dirty(window_get_root_layer(s_window));
 }
 
-static void window_unload(Window *s_window) {
+static void handle_window_unload(Window *s_window) {
   layer_destroy(s_simple_bg_layer);
   layer_destroy(s_date_layer);
 
@@ -125,27 +129,29 @@ static void window_unload(Window *s_window) {
   layer_destroy(s_hands_layer);
 }
 
+
 static void init() {
 
   s_day_buffer[0] = '\0';
   s_num_buffer[0] = '\0';
 
 // init hand paths
-
-  Layer *window_layer = window_get_root_layer(s_window);
+	Layer *window_layer = window_get_root_layer(s_window);
   GRect bounds = layer_get_bounds(window_layer);
 
   tick_timer_service_subscribe(MINUTE_UNIT, handle_second_tick);
+	APP_LOG(APP_LOG_LEVEL_INFO, "init: finito!");
 }
 
 static void deinit() {
-  tick_timer_service_unsubscribe();
+	APP_LOG(APP_LOG_LEVEL_INFO, "deinit start...");
+	tick_timer_service_unsubscribe();
   window_destroy(s_window);
 }
 
 
 static void window_load(Window *s_window) {
-  Layer *window_layer = window_get_root_layer(s_window);
+ Layer *window_layer = window_get_root_layer(s_window);
   GRect bounds = layer_get_bounds(window_layer);
 
   s_date_layer = layer_create(bounds);
@@ -153,17 +159,16 @@ static void window_load(Window *s_window) {
   layer_add_child(window_layer, s_date_layer);
 
   s_day_label = text_layer_create(GRect(46, 114, 27, 20));
-  text_layer_set_text(s_day_label, s_day_buffer);
-  text_layer_set_background_color(s_day_label, GColorClear);
-  text_layer_set_text_color(s_day_label, GColorWhite);
-  text_layer_set_font(s_day_label, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+  //text_layer_set_text(s_day_label, s_day_buffer);
+  //text_layer_set_background_color(s_day_label, GColorClear);
+  //text_layer_set_text_color(s_day_label, GColorWhite);
+  //text_layer_set_font(s_day_label, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+  //layer_add_child(s_date_layer, text_layer_get_layer(s_day_label));
 
-  layer_add_child(s_date_layer, text_layer_get_layer(s_day_label));
-
-  s_num_label = text_layer_create(GRect(73, 114, 18, 20));
+  s_num_label = text_layer_create(GRect(113, 124, 18, 20));
   text_layer_set_text(s_num_label, s_num_buffer);
   text_layer_set_background_color(s_num_label, GColorBlack);
-  text_layer_set_text_color(s_num_label, GColorWhite);
+  text_layer_set_text_color(s_num_label, GColorYellow);
   text_layer_set_font(s_num_label, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
 
   layer_add_child(s_date_layer, text_layer_get_layer(s_num_label));
@@ -171,10 +176,11 @@ static void window_load(Window *s_window) {
   s_hands_layer = layer_create(bounds);
   layer_set_update_proc(s_hands_layer, hands_update_proc);
   layer_add_child(window_layer, s_hands_layer);
+	APP_LOG(APP_LOG_LEVEL_INFO, "Window_load fatto");
 }
 
 void show_win_snupy(void) {
-  initialise_ui();
+    initialise_ui();
   window_set_window_handlers(s_window, (WindowHandlers) {
 		.load = window_load,
     .unload = handle_window_unload,
@@ -190,7 +196,9 @@ void hide_win_snupy(void) {
 int main() {
   show_win_snupy();
 	init();
+	APP_LOG(APP_LOG_LEVEL_INFO, "Vai col luup!");
  	app_event_loop();
+	APP_LOG(APP_LOG_LEVEL_INFO, "hide winsnupy... thatisallfalk!");
 	hide_win_snupy();
   deinit();
 }
