@@ -1,10 +1,12 @@
 {
-    "appKeys": {},
+    "appKeys": {
+        "KEY_COLOR": 0
+    },
     "capabilities": [
-        ""
+        "configurable"
     ],
     "companyName": "andrea.ottaviani.69@gmail.com",
-    "longName": "Snupy",
+    "longName": "SnoopyTimewath",
     "projectType": "native",
     "resources": {
         "media": [
@@ -16,26 +18,23 @@
             {
                 "file": "images/ore.png",
                 "name": "IMG_ORE",
-                "targetPlatforms": [
-                    "basalt"
-                ],
                 "type": "png"
             },
             {
-                "file": "images/snupy_noarms.png",
+                "file": "images/snupy_noarms_64_last.png",
                 "name": "IMG_SNUPY",
                 "type": "png"
             }
         ]
     },
     "sdkVersion": "3",
-    "shortName": "Snupy",
+    "shortName": "SnoopyTime",
     "targetPlatforms": [
         "basalt"
     ],
     "uuid": "00dcb5e7-5a6d-4a50-9e8a-55f7c614b0d4",
     "versionLabel": "1.0",
     "watchapp": {
-        "watchface": false
+        "watchface": true
     }
 }

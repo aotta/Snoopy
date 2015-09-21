@@ -1,5 +1,9 @@
 #include <pebble.h>
 #include "win_snupy.h"
+#define KEY_COLOR 0
+	
+static int color = 0xFFFFAA;
+
 
 
 	// ricorda di aggiungere : bitmap_layer_set_compositing_mode(s_bitmaplayer_1, GCompOpSet);
@@ -21,11 +25,50 @@ static BitmapLayer *s_bitmaplayer_1;
 static RotBitmapLayer *s_bitmaplayer_ore;
 static GColor Colore;
 
+static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Message received!");
+
+  // Read first item
+  Tuple *t = dict_read_first(iterator);
+
+  // For all items
+  while(t != NULL) {
+    // Which key was received?
+    switch(t->key) {
+    case KEY_COLOR:
+      // color returned as a hex string
+      if (t->value->int32 > 0) {
+        color = t->value->int32;
+        APP_LOG(APP_LOG_LEVEL_INFO, "Saving color: %x", color);
+        window_set_background_color(s_window, GColorFromHEX(color)); 
+        persist_write_int(KEY_COLOR, color);
+      }
+      break;
+    default:
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
+      break;
+    }
+    // Look for next item
+    t = dict_read_next(iterator);
+  }
+}
+
+static void inbox_dropped_callback(AppMessageResult reason, void *context) {
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped!");
+}
+
+static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed!");
+}
+
+static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
+}
+
 static void initialise_ui(void) {
   s_window = window_create();
-	Colore = GColorVividCerulean;
+	Colore = GColorCobaltBlue;
   window_set_background_color(s_window, Colore);
-	APP_LOG(APP_LOG_LEVEL_INFO, "Colore: vividcerulean");
   #ifndef PBL_SDK_3
     window_set_fullscreen(s_window, true);
   #endif
@@ -73,20 +116,19 @@ static void window_unload(Window* window) {
 
 static void hands_update_proc(Layer *layer, GContext *ctx) {
 
-	APP_LOG(APP_LOG_LEVEL_INFO, "rotate start!");
-  time_t now = time(NULL);
+	time_t now = time(NULL);
   struct tm *t = localtime(&now);
   
   // minute/hour hand
 
 	//  "ORE"
-  // GPoint src_ic = GPoint(48,20);
+  GPoint src_ic = GPoint(54,54);
 
   // Angle of rotation
   int angle = (TRIG_MAX_ANGLE * (((t->tm_hour % 12) * 6) + (t->tm_min / 10))) / (12 * 6);
 
 	// Draw!
-  //rot_bitmap_set_src_ic(s_bitmaplayer_ore, src_ic);
+  rot_bitmap_set_src_ic(s_bitmaplayer_ore, src_ic);
 	rot_bitmap_layer_set_angle(s_bitmaplayer_ore,angle);
 
 	
@@ -94,13 +136,12 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
   
   // Angle of rotation
   angle = (TRIG_MAX_ANGLE * t->tm_min / 60);
-  //src_ic = GPoint(10,20);
+  src_ic = GPoint(55,60);
 	
   // Draw!
-	//rot_bitmap_set_src_ic(s_bitmaplayer_minuti, src_ic);
+	rot_bitmap_set_src_ic(s_bitmaplayer_minuti, src_ic);
 	rot_bitmap_layer_set_angle(s_bitmaplayer_minuti,angle);
-	APP_LOG(APP_LOG_LEVEL_INFO, "rotate finish!");
-  
+	  
 }
 
 static void date_update_proc(Layer *layer, GContext *ctx) {
@@ -115,7 +156,6 @@ static void date_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
-	APP_LOG(APP_LOG_LEVEL_INFO, "minuto cambiato!");
   layer_mark_dirty(window_get_root_layer(s_window));
 }
 
@@ -132,6 +172,21 @@ static void handle_window_unload(Window *s_window) {
 
 static void init() {
 
+	if (persist_exists(KEY_COLOR)) {
+    color = persist_read_int(KEY_COLOR);
+    APP_LOG(APP_LOG_LEVEL_INFO, "Reading color: %x", color);
+  }
+  
+  // Register callbacks
+  app_message_register_inbox_received(inbox_received_callback);
+  app_message_register_inbox_dropped(inbox_dropped_callback);
+  app_message_register_outbox_failed(outbox_failed_callback);
+  app_message_register_outbox_sent(outbox_sent_callback);
+
+  // Open AppMessage
+  app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
+
+
   s_day_buffer[0] = '\0';
   s_num_buffer[0] = '\0';
 
@@ -140,11 +195,9 @@ static void init() {
   GRect bounds = layer_get_bounds(window_layer);
 
   tick_timer_service_subscribe(MINUTE_UNIT, handle_second_tick);
-	APP_LOG(APP_LOG_LEVEL_INFO, "init: finito!");
 }
 
 static void deinit() {
-	APP_LOG(APP_LOG_LEVEL_INFO, "deinit start...");
 	tick_timer_service_unsubscribe();
   window_destroy(s_window);
 }
@@ -158,14 +211,14 @@ static void window_load(Window *s_window) {
   layer_set_update_proc(s_date_layer, date_update_proc);
   layer_add_child(window_layer, s_date_layer);
 
-  s_day_label = text_layer_create(GRect(46, 114, 27, 20));
+  s_day_label = text_layer_create(GRect(30, 116, 18, 16));
   //text_layer_set_text(s_day_label, s_day_buffer);
   //text_layer_set_background_color(s_day_label, GColorClear);
   //text_layer_set_text_color(s_day_label, GColorWhite);
   //text_layer_set_font(s_day_label, fonts_get_system_font(FONT_KEY_GOTHIC_18));
   //layer_add_child(s_date_layer, text_layer_get_layer(s_day_label));
 
-  s_num_label = text_layer_create(GRect(113, 124, 18, 20));
+  s_num_label = text_layer_create(GRect(113, 116, 18, 24));
   text_layer_set_text(s_num_label, s_num_buffer);
   text_layer_set_background_color(s_num_label, GColorBlack);
   text_layer_set_text_color(s_num_label, GColorYellow);
@@ -176,7 +229,6 @@ static void window_load(Window *s_window) {
   s_hands_layer = layer_create(bounds);
   layer_set_update_proc(s_hands_layer, hands_update_proc);
   layer_add_child(window_layer, s_hands_layer);
-	APP_LOG(APP_LOG_LEVEL_INFO, "Window_load fatto");
 }
 
 void show_win_snupy(void) {
