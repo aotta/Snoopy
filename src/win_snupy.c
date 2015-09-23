@@ -2,7 +2,7 @@
 #include "win_snupy.h"
 #define KEY_COLOR 0
 	
-static int color = 0xFFFFAA;
+static int color = 0x0011FF;
 
 
 
@@ -67,8 +67,8 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
 
 static void initialise_ui(void) {
   s_window = window_create();
-	Colore = GColorCobaltBlue;
-  window_set_background_color(s_window, Colore);
+	//Colore = GColorCobaltBlue;
+  window_set_background_color(s_window, GColorFromHEX(color));
   #ifndef PBL_SDK_3
     window_set_fullscreen(s_window, true);
   #endif
@@ -248,7 +248,6 @@ void hide_win_snupy(void) {
 int main() {
   show_win_snupy();
 	init();
-	APP_LOG(APP_LOG_LEVEL_INFO, "Vai col luup!");
  	app_event_loop();
 	APP_LOG(APP_LOG_LEVEL_INFO, "hide winsnupy... thatisallfalk!");
 	hide_win_snupy();

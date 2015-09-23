@@ -1,6 +1,7 @@
 Pebble.addEventListener('showConfiguration', function(e) {
   var color = localStorage.getItem('color');
-  if (! color) { color = "FFFFAA"; }
+	console.log('Local color:' + color);
+  if (! color) { color = "0011FF"; }
   var URL = 'http://aotta.github.io/Snoopy/configuration.html?' +
       'color=' + color;
   console.log('Configuration window opened. ' + URL);
