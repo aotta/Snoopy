@@ -90,17 +90,15 @@
 
         <fieldset class="ui-grid-a">
           <div class="ui-block-a"><button type="submit" data-theme="d" id="b-cancel">Cancel</button></div>
-          <div class="ui-block-b"><button type="submit" data-theme="a" id="b-submit">Submit</button></div>
+          <div class="ui-block-b"><button type="submit" data-theme="a" id="b-submit">Save</button></div>
         </fieldset>
     </div>
 
     <script>
       var options = {};
-
       function saveOptions() {
         return options;
       }
-
       function getUrlParameter(sParam, default_) {
         var sPageURL = window.location.search.substring(1);
         var sURLVariables = sPageURL.split('&');
@@ -112,23 +110,17 @@
         }
         return default_;
       }          
-
       $().ready(function() {
-
         $('#b-cancel').click(function() {
           console.log('Cancel');
           var return_to = getUrlParameter('return_to', 'pebblejs://close');
           document.location = return_to;
         });
-
-        $('#b-fore').click(function() {
-         console.log("Foreground");
+        $('#b-submit').click(function() {
+         console.log("Submit");
          var return_to = getUrlParameter('return_to', 'pebblejs://close#');
          document.location = return_to + encodeURIComponent(JSON.stringify(saveOptions()));
-
         });
-        
-
         function selectColor($polygon) {
           var hexValue = $polygon.attr('fill').replace('#', '');
           console.log (hexValue);
@@ -137,16 +129,12 @@
           $polygon.attr('stroke', '#000').attr('stroke-width', '3');
           $polygon.parent().append($polygon);
         }
-
         $('#color-picker polygon').on('click', function() {
           selectColor($(this));
         });
-
        // Were we passed any values?
        options['color'] = getUrlParameter('color', 'FFFFAA');
-
       });
-
     </script>
   </body>
 </html>
