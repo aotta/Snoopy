@@ -90,8 +90,7 @@
 
         <fieldset class="ui-grid-a">
           <div class="ui-block-a"><button type="submit" data-theme="d" id="b-cancel">Cancel</button></div>
-          <div class="ui-block-b"><button type="submit" data-theme="a" id="b-fore">Foreground</button></div>
-          <div class="ui-block-c"><button type="submit" data-theme="a" id="b-back">Background</button></div>
+          <div class="ui-block-b"><button type="submit" data-theme="a" id="b-submit">Submit</button></div>
         </fieldset>
     </div>
 
@@ -125,16 +124,10 @@
         $('#b-fore').click(function() {
          console.log("Foreground");
          var return_to = getUrlParameter('return_to', 'pebblejs://close#');
-         document.location = return_to + encodeURIComponent(JSON.stringify("f"+saveOptions()));
+         document.location = return_to + encodeURIComponent(JSON.stringify(saveOptions()));
 
         });
         
-        $('#b-back').click(function() {
-         console.log("Background");
-         var return_to = getUrlParameter('return_to', 'pebblejs://close#');
-         document.location = return_to + encodeURIComponent(JSON.stringify("b"+saveOptions()));
-
-        });
 
         function selectColor($polygon) {
           var hexValue = $polygon.attr('fill').replace('#', '');
